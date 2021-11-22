@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.client.login.dao.LoginDao">
+	<select id = "userIdSelect" parameterType="String" resultType="login">
+		SELECT
+				userId,
+				userPw,
+				userName
+		FROM spring_member
+		WHERE userId = #{userId}
+	</select>
+	
+	<select id="loginSelect" parameterType="login" resultType="login">
+		<!-- 로그린 처리 쿼리 -->
+		SELECT
+				userId,
+				userPw,
+				userName
+		FROM spring_member
+		WHERE userId = #{userId} and userPw = #{userPw}
+	</select>
+	
+	<insert id="loginHistoryInsert" parameterType="login">
+		INSERT INTO login_history(
+				idx, userId, retry, lastFailedLogin, lastSuccessedLogin, clientIp)
+		VALUES(
+				login_history_seq.nextval, #{userId}, #{retry,jdbcType=INTEGER},
+				#{lastFailedLogin,jdbcType=INTEGER},
+				#{lastSuccessedLogin,jdbcType=INTEGER},
+				#{clientIp,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<update id="loginHistoryUpdate" parameterType="login">
+		UPDATE login_history
+		SET retry = #{retry},
+				lastFailedLogin = #{lastFailedLogin},
+				lastSuccessedLogin = #{lastSuccessedLogin},
+				clientIp = #{clientIp,jdbcType=VARCHAR}
+		WHERE idx = #{idx} and userId = #{userId}
+	</update>
+	
+	<select id="loginHistorySelect" parameterType="String" resultType="login">
+		SELECT
+			idx,
+			userId,
+			retry,
+			lastFailedLogin,
+			lastSuccessedLogin,
+			clientIp
+		FROM login_history
+		WHERE userId = #{userId}
+	</select>
+</mapper>
